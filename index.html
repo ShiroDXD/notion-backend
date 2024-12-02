@@ -64,6 +64,13 @@
     </div>
 
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set default value to December 21, 10:30 PM SGT
+        const defaultDate = new Date('2024-12-21T22:30:00+08:00'); // SGT is UTC+8
+        const formattedDate = defaultDate.toISOString().slice(0, 16); // Format to 'yyyy-MM-ddTHH:mm'
+        document.getElementById('event-date').value = formattedDate;
+    });
+
         let countdownInterval;
 
         // Function to fetch the event date from the backend
