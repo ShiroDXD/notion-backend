@@ -1,49 +1,137 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Set default value to December 21, 10:30 PM SGT
-    const defaultDate = new Date('2024-12-21T22:30:00+08:00'); // SGT is UTC+8
-    const formattedDate = defaultDate.toISOString().slice(0, 16); // Format to 'yyyy-MM-ddTHH:mm'
-    document.getElementById('event-date').value = formattedDate;
-
-    // Automatically start the countdown with the pre-populated date
-    const eventDate = defaultDate.getTime();
-    countdownToEvent(eventDate);
-});
-
-let countdownInterval;
-
-// Countdown logic
-function countdownToEvent(eventDate) {
-    function updateCountdown() {
-        const now = new Date().getTime();
-        const distance = eventDate - now;
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById('days').textContent = days.toString().padStart(2, '0');
-        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-
-        if (distance < 0) {
-            clearInterval(countdownInterval);
-            document.querySelector('.countdown').textContent = "Event has passed!";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Countdown Timer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: transparent; /* Transparent background */
+            font-family: 'Helvetica', Arial, sans-serif;
+            color: white;
         }
-    }
+        .countdown {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .countdown-item {
+            text-align: center;
+        }
+        .time {
+            font-size: 4rem;
+            font-weight: bold;
+        }
+        .label {
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+        }
+        .date-picker {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="date-picker">
+        <label for="event-date">Select Event Date & Time: </label>
+        <input type="datetime-local" id="event-date">
+        <button id="start-timer">Start Countdown</button>
+    </div>
 
-    clearInterval(countdownInterval);  // Clear any previous interval
-    countdownInterval = setInterval(updateCountdown, 1000);
-    updateCountdown();  // Initial call to set the time immediately
-}
+    <div class="countdown">
+        <div class="countdown-item">
+            <div class="time" id="days">00</div>
+            <div class="label">DAYS</div>
+        </div>
+        <div class="countdown-item">
+            <div class="time" id="hours">00</div>
+            <div class="label">HOURS</div>
+        </div>
+        <div class="countdown-item">
+            <div class="time" id="minutes">00</div>
+            <div class="label">MINUTES</div>
+        </div>
+        <div class="countdown-item">
+            <div class="time" id="seconds">00</div>
+            <div class="label">SECONDS</div>
+        </div>
+    </div>
 
-document.getElementById('start-timer').addEventListener('click', () => {
-    const eventDateInput = document.getElementById('event-date').value;
-    if (eventDateInput) {
-        const eventDate = new Date(eventDateInput).getTime();
-        countdownToEvent(eventDate);
-    } else {
-        alert('Please select a valid date and time.');
-    }
-});
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default value to December 21, 10:30 PM SGT
+            const defaultDate = new Date('2024-12-21T22:30:00+08:00'); // SGT is UTC+8
+            const formattedDate = defaultDate.toISOString().slice(0, 16); // Format to 'yyyy-MM-ddTHH:mm'
+            const eventDateInput = document.getElementById('event-date');
+            
+            if (eventDateInput) {
+                eventDateInput.value = formattedDate;
+                const eventDate = defaultDate.getTime();
+
+                if (!isNaN(eventDate)) {
+                    countdownToEvent(eventDate); // Automatically start countdown
+                } else {
+                    console.error('Invalid default event date');
+                }
+            } else {
+                console.error('Event date input element not found in DOM');
+            }
+        });
+
+        let countdownInterval;
+
+        // Countdown logic
+        function countdownToEvent(eventDate) {
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = eventDate - now;
+
+                if (isNaN(distance)) {
+                    console.error('Invalid countdown calculation');
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').textContent = days.toString().padStart(2, '0');
+                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    document.querySelector('.countdown').textContent = "Event has passed!";
+                }
+            }
+
+            clearInterval(countdownInterval); // Clear any previous interval
+            countdownInterval = setInterval(updateCountdown, 1000);
+            updateCountdown(); // Initial call to set the time immediately
+        }
+
+        document.getElementById('start-timer').addEventListener('click', () => {
+            const eventDateInput = document.getElementById('event-date').value;
+            if (eventDateInput) {
+                const eventDate = new Date(eventDateInput).getTime();
+
+                if (!isNaN(eventDate)) {
+                    countdownToEvent(eventDate);
+                } else {
+                    alert('Invalid date and time. Please select again.');
+                }
+            } else {
+                alert('Please select a valid date and time.');
+            }
+        });
+    </script>
+</body>
+</html>
